@@ -1,10 +1,10 @@
 import ServiceUser from '../service/users.js'
 
 class ControllerUser {
-  FindAll(_, res) {
+  async FindAll(_, res) {
     try {
-      const nomes = ServiceUser.FindAll()
-      res.status(200).send({ nomes })
+      const users = await ServiceUser.FindAll()
+      res.status(200).send({ users })
     } catch (error) {
       res.status(500).send({ error: error.message })
     }
@@ -12,9 +12,7 @@ class ControllerUser {
   
   async FindOne(req, res) {
     try {
-      console.log(req.headers.user)
-      const id = req.params.id
-      console.log(id)
+      const id = req.params.id || req.headers?.user?.id
 
       const user = await ServiceUser.FindOne(id)
       res.status(200).send({ user })
@@ -25,19 +23,24 @@ class ControllerUser {
 
   async Create(req, res) {
     try {
+      const loggedUser = req.headers?.user
+      let permissao = 1
+      if(loggedUser){
+        permissao = req.body.permissao
+      }
       const { nome, email, senha, ativo } = req.body
-      await ServiceUser.Create(nome, email, senha, ativo, 1)
+      await ServiceUser.Create(nome, email, senha, ativo, permissao)
       res.status(201).send()
     } catch (error) {
       res.status(500).send({ error: error.message })
     }
   }
   
-  Update(req, res) {
+  async Update(req, res) {
     try {
-      const id = req.params.id
+      const id = req.params.id || req.headers?.user?.id
       const nome = req.body.nome
-      ServiceUser.Update(id, nome)
+      await ServiceUser.Update(id, nome)
       res.status(200).send()
     } catch (error) {
       res.status(500).send({ error: error.message })
@@ -46,7 +49,7 @@ class ControllerUser {
   
   Delete(req, res) {
     try {
-      const id = req.params.id
+      const id = req.params.id || req.headers?.user?.id
       ServiceUser.Delete(id)
       res.status(204).send()
     } catch (error) {

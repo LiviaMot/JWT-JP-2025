@@ -8,7 +8,7 @@ const SALT = 10 // 12
 class ServiceUser {
 
   FindAll() {
-    // return User.FindAll()
+    return User.findAll()
   }
 
   async FindOne(id) {
@@ -44,7 +44,8 @@ class ServiceUser {
       ? await bcrypt.hash(String(senha), SALT) // if
       : oldUser.senha // else
 
-    // User.Update(id, nome)
+    return User.update(id, nome)
+    // return User.Update(id, nome)
   }
 
   async Delete(id) {
